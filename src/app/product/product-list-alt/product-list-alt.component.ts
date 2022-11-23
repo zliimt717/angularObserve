@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { catchError, EMPTY, Subscription } from 'rxjs';
 import { Product } from '../product';
 import { ProductService } from '../product.service';
 
@@ -9,7 +9,7 @@ import { ProductService } from '../product.service';
   styles: [
   ]
 })
-export class ProductListAltComponent implements OnInit,OnDestroy {
+export class ProductListAltComponent {
 
   pageTitle='Products';
   errorMessage='';
@@ -18,16 +18,16 @@ export class ProductListAltComponent implements OnInit,OnDestroy {
   products:Product[]=[];
   sub!:Subscription;
 
+  products$=this.productService.products$
+  .pipe(
+    catchError(err=>{
+      this.errorMessage=err;
+      return EMPTY;
+    })
+   );
+
   constructor(private productService:ProductService) { }
 
-  ngOnInit(): void {
-    this.sub=this.productService.getProducts().subscribe(
-      {
-        next:products=>this.products=products,
-        error:err=>this.errorMessage=err
-      }
-    );
-  }
 
   ngOnDestroy(): void {
     //Called once, before the instance is destroyed.
