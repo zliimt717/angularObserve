@@ -1,5 +1,5 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { Component, OnInit } from '@angular/core';
+import { Observable } from 'rxjs';
 import { ProductCategory } from 'src/app/product-categories/product-category';
 import { Product } from '../product';
 import { ProductService } from '../product.service';
@@ -9,28 +9,18 @@ import { ProductService } from '../product.service';
   templateUrl: './product-list.component.html',
   styleUrls: ['./product-list.component.scss']
 })
-export class ProductListComponent implements OnInit, OnDestroy{
+export class ProductListComponent implements OnInit{
   pageTitle:string='Product List';
   errorMessage='';
   categories:ProductCategory[]=[];
 
-  products:Product[]=[];
-  sub!:Subscription;
+  products$:Observable<Product[]> | undefined;
 
   constructor(private productService: ProductService) { }
   
   ngOnInit(): void {
-    this.sub=this.productService.getProducts()
-    .subscribe({
-      next:products=>this.products=products,
-      error:err=>this.errorMessage=err,
-    });
+   this.products$= this.productService.getProducts()
   }
-
-  ngOnDestroy(): void {
-    this.sub.unsubscribe();
-  }
-
 
   onAdd(): void{
     console.log('Not yet implement');
